@@ -1,0 +1,83 @@
+html, body, #app {
+  width 100%
+  height 100%
+  margin 0
+  padding 0
+}
+.el-card {
+  margin-top 20px
+}
+.el-main .input-with-select {
+  width 30%
+  margin-bottom 10px
+  margin-right 10px
+}
+.el-main .articles .input-with-select {
+  width 100%
+}
+.el-pagination {
+  margin-top 20px
+}
+.add {
+  margin-left 20px
+}
+.el-button--primary {
+  background green
+}
+#app {
+  .el-button--primary {
+    background #f284a9
+    border-color #f284a9
+    &:hover {
+      background #f36696
+    }
+  }
+  .el-menu-item {
+    color #f284a9
+  }
+  .el-button {
+    &:hover {
+      color #f284a9
+      background #fff9fb
+    }
+  }
+  .el-switch.is-checked .el-switch__core {
+    background-color #f284a9
+    border-color #f284a9
+  }
+  .el-loading-spinner .path {
+    stroke #f284a9
+  }
+}
+#app {
+  z-index 1
+  position relative
+  width 100%
+  height 100%
+}
+body #bg {
+  top 0
+  bottom 0
+  left 0
+  right 0
+}
+.el-main {
+  .el-card {
+    background rgba(232, 230, 230, 0.5)
+  }
+  .el-card .el-table, .el-table__expanded-cell {
+    background-color transparent
+  }
+  .el-card .el-table tr {
+    background-color transparent !important
+  }
+  // .el-card .el-table--enable-row-transition .el-table__body td, .el-table .cell {
+  // background-color transparent
+  // }
+  .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+    background-color transparent
+  }
+  .el-table th.el-table__cell {
+    background-color transparent
+  }
+}

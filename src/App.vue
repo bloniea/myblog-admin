@@ -1,0 +1,19 @@
+<script setup>
+import { defineComponent } from 'vue'
+import { ElConfigProvider } from 'element-plus'
+
+import zhCn from 'element-plus/lib/locale/lang/zh-cn'
+</script>
+
+<template>
+  <el-config-provider :locale="zhCn">
+    <router-view />
+  </el-config-provider>
+
+</template>
+
+<style>
+#app {
+
+}
+</style>
