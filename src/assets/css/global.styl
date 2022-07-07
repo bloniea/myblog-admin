@@ -25,6 +25,18 @@ html, body, #app {
   background green
 }
 #app {
+  z-index 1
+  position relative
+  width 100%
+  height 100%
+}
+body #bg {
+  top 0
+  bottom 0
+  left 0
+  right 0
+}
+#app {
   .el-button--primary {
     background #f284a9
     border-color #f284a9
@@ -39,6 +51,12 @@ html, body, #app {
     &:hover {
       color #f284a9
       background #fff9fb
+      border-color #f0c3d2
+    }
+  }
+  .el-input__inner {
+    &:focus {
+      border-color #f0c3d2
     }
   }
   .el-switch.is-checked .el-switch__core {
@@ -48,36 +66,37 @@ html, body, #app {
   .el-loading-spinner .path {
     stroke #f284a9
   }
-}
-#app {
-  z-index 1
-  position relative
-  width 100%
-  height 100%
-}
-body #bg {
-  top 0
-  bottom 0
-  left 0
-  right 0
-}
-.el-main {
-  .el-card {
-    background rgba(232, 230, 230, 0.5)
+  .el-tag {
+    color #fff
   }
-  .el-card .el-table, .el-table__expanded-cell {
-    background-color transparent
+  .el-select .el-tag {
+    color #000
   }
-  .el-card .el-table tr {
-    background-color transparent !important
+  .el-message-box button.el-button--primary {
+    background #f284a9
+    border-color #f284a9
+    &:hover {
+      background #f36696
+    }
   }
-  // .el-card .el-table--enable-row-transition .el-table__body td, .el-table .cell {
-  // background-color transparent
-  // }
-  .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
-    background-color transparent
-  }
-  .el-table th.el-table__cell {
-    background-color transparent
+  .el-main {
+    .el-card {
+      background rgba(232, 230, 230, 0.5)
+    }
+    .el-card .el-table, .el-table__expanded-cell {
+      background-color transparent
+    }
+    .el-card .el-table tr {
+      background-color transparent !important
+    }
+    // .el-card .el-table--enable-row-transition .el-table__body td, .el-table .cell {
+    // background-color transparent
+    // }
+    .el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+      background-color transparent
+    }
+    .el-table th.el-table__cell {
+      background-color transparent
+    }
   }
 }

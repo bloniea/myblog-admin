@@ -22,7 +22,7 @@
         >
           <el-input
             v-model="loginData.user"
-            @keyup.enter="onSubmit"
+            @keyup.enter="onSubmit(loginForm)"
           ></el-input>
         </el-form-item>
         <el-form-item
@@ -33,17 +33,33 @@
           <el-input
             v-model="loginData.password"
             type="password"
-            @keyup.enter="onSubmit"
+            @keyup.enter="onSubmit(loginForm)"
           ></el-input>
+        </el-form-item>
+        <el-form-item
+          label="验证码"
+          prop="code"
+        >
+          <div class="s-identify-box">
+            <el-input
+              v-model="loginData.code"
+              @keyup.enter="onSubmit(loginForm)"
+            ></el-input>
+            <SIdentify
+              :identifyCode="code"
+              @click="identifyCode"
+            ></SIdentify>
+          </div>
+
         </el-form-item>
         <el-form-item class="login-btn">
 
           <el-button
             type="primary"
             :loading="loginLoad"
-            @click="onSubmit"
+            @click="onSubmit(loginForm)"
           >登陆</el-button>
-          <el-button @click="reset">重置</el-button>
+          <el-button @click="reset(loginForm)">重置 </el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -52,10 +68,25 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
-import { onBeforeRouteLeave, useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router'
-// import $axios from 'axios'
+import { useRouter, useRoute, } from 'vue-router'
+import SIdentify from '@/components/SIdentify/index.vue'
+import { login } from '@/comm/fetch'
+
 const router = useRouter()
-const route = useRoute()
+
+
+const validateCode = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入验证码'))
+  } else {
+    if (loginData.code !== code.value) {
+      callback(new Error('验证码错误'))
+    } else {
+      callback()
+    }
+
+  }
+}
 // 变量
 const loginRules = {
   user: [
@@ -63,37 +94,55 @@ const loginRules = {
   ],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' }
-  ]
+  ],
+  code: [{ validator: validateCode, trigger: 'change' }],
 }
+
+const code = ref('')
+const identifyCode = () => {
+  const str = '1234567890abcdefghijklmnopqrstuvwsyz'
+  let c = ''
+  for (let i = 0; i < 4; i++) {
+    let num = Math.floor(Math.random() * (str.length - 1))
+    c += str[num]
+  }
+  code.value = c
+}
+// 初始化验证码
+identifyCode()
+// 登录信息
 const loginData = reactive({
-  user: '',
-  password: ''
+  user: 'test',
+  password: '123456',
+  code: ''
 })
+
+const loginForm = ref()
 const loginLoad = ref(false)
-
-const { proxy: p } = getCurrentInstance()
 // 登陆
-const onSubmit = () => {
-
-
-  p.$refs.loginForm.validate(async valid => {
+const onSubmit = (loginForm) => {
+  loginForm.validate(async valid => {
     if (valid) {
       loginLoad.value = true
-      const { data: res } = await p.$axios.post('/adminApi/login', loginData)
-      loginLoad.value = false
-      if (res.meta.status != 200) {
-        return ElMessage.error(res.meta.msg)
+      const reqData = { user: loginData.user, password: loginData.password }
+      const res = await login(reqData)
+      if (res.ok && res.status === 200) {
+        loginLoad.value = false
+        ElMessage.success('登录成功')
+        window.localStorage.setItem('userInfo', JSON.stringify(res.data.data.user))
+        window.localStorage.setItem('token', res.data.data.token)
+        window.localStorage.setItem('refresh_token', res.data.data.refresh_token)
+        router.push({ name: 'Welcome' })
+      } else {
+        loginLoad.value = false
+        ElMessage.error('用户名或密码错误')
       }
-      ElMessage.success(res.meta.msg)
-      window.sessionStorage.setItem('userInfo', JSON.stringify(res.data))
-      window.sessionStorage.setItem('token', res.data.token)
-      router.push({ name: 'Welcome' })
     }
   })
 }
 // 重置表单
-const reset = () => {
-  this.$refs.loginForm.resetFields()
+const reset = (loginForm) => {
+  loginForm.resetFields()
 }
 
 
@@ -105,7 +154,7 @@ const reset = () => {
   height 100%
   .login-form {
     width 400px
-    height 400px
+    height 440px
     background #fff
     position absolute
     top 50%
@@ -125,6 +174,13 @@ const reset = () => {
     }
     .title {
       text-align center
+    }
+    .s-identify-box {
+      display flex
+      justify-content space-between
+      .el-input {
+        width 40%
+      }
     }
     .login-btn {
       display flex

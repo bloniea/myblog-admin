@@ -1,30 +1,26 @@
 <template>
   <router-view v-if="$route.meta.article"></router-view>
-  <div
-    class="articles"
-    v-else
-  >
+  <div class="articles" v-else>
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ name:'Home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name: 'Home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>文章管理</el-breadcrumb-item>
       <el-breadcrumb-item>文章列表</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
       <!-- 搜索框 -->
       <div class="head-con">
-
         <div class="cat">
           分类:
           <el-select
             placeholder="请选择"
-            v-model="articles.category_id"
+            v-model="articles.req.category_id"
             clearable
           >
             <el-option
               v-for="item in articles.categories"
-              :key="item.id"
+              :key="item._id"
               :label="item.cat_name"
-              :value="item.id"
+              :value="item._id"
             >
             </el-option>
           </el-select>
@@ -35,12 +31,13 @@
             placeholder="请选择"
             v-model="articles.label_ids"
             multiple
+            tag-type="danger"
           >
             <el-option
               v-for="item in articles.labels"
-              :key="item.id"
-              :label="item.label_name"
-              :value="item.id"
+              :key="item._id"
+              :label="item.name"
+              :value="item._id"
             >
             </el-option>
           </el-select>
@@ -49,27 +46,23 @@
           <el-input
             placeholder="请输入内容"
             class="input-with-select"
-            v-model="articles.req.query"
+            v-model="articles.req.keyword"
             @keyup.enter="searchArticle"
-            @change="changeNull"
+            @blur="changeNull(articles.req.keyword)"
+            clearable
+            @clear="searchArticle"
           >
             <template #append>
-              <el-button
-                :icon="Search"
-                @click="searchArticle"
-              ></el-button>
+              <el-button :icon="Search" @click="searchArticle"></el-button>
             </template>
           </el-input>
         </div>
 
         <div>
-          <el-button
-            type="primary"
-            class="add"
-            @click="toAddArticle"
-          >添加文章</el-button>
+          <el-button type="primary" class="add" @click="toAddArticle"
+            >添加文章</el-button
+          >
         </div>
-
       </div>
 
       <el-table
@@ -78,79 +71,57 @@
         v-loading="loading"
         style="width: 100%"
       >
-        <el-table-column
-          label="#"
-          type="index"
-        >
+        <el-table-column label="#" type="index"> </el-table-column>
+        <el-table-column prop="title" label="标题"> </el-table-column>
+        <el-table-column prop="cat_name" label="分类">
+          <template #default="scope">
+            {{
+              scope.row.category.cat_name ? scope.row.category.cat_name : '无'
+            }}
+          </template>
         </el-table-column>
-        <el-table-column
-          prop="title"
-          label="标题"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="cat_name"
-          label="分类"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="labels"
-          label="标签"
-        >
+        <el-table-column prop="labels" label="标签">
           <template #default="scope">
             <div v-if="scope.row.labels">
               <el-tag
-                v-for="(item,i) in formatLabel(scope.row.labels)"
+                v-for="(item, i) in scope.row.labels"
                 :key="i"
-              >{{item}}</el-tag>
+                :color="item.color"
+                >{{ item.name }}</el-tag
+              >
             </div>
-
           </template>
         </el-table-column>
-        <el-table-column
-          prop="img_url"
-          label="图片"
-        >
+        <el-table-column prop="img_url" label="图片">
           <template #default="scope">
             <div class="img-box">
-              <el-image
-                :src="scope.row.img_url"
-                fit="contain"
-              ></el-image>
+              <el-image :src="scope.row.img_url" fit="contain"></el-image>
             </div>
-
           </template>
         </el-table-column>
-        <el-table-column
-          prop="img_source"
-          label="图片来源"
-        >
-        </el-table-column>
-        <el-table-column
-          prop="created_at"
-          label="创建时间"
-        >
+        <el-table-column prop="img_source" label="图片来源"> </el-table-column>
+        <el-table-column prop="created_at" label="创建时间">
           <template #default="scope">
-            {{stampToTime(scope.row.created_at)}}
-
+            {{ stampToTime(scope.row.created_at) }}
           </template>
         </el-table-column>
         <el-table-column label="操作">
           <template #default="scope">
-
             <el-button
               type="primary"
               :icon="Edit"
               @click="showEditView(scope.row)"
               size="small"
-            >修改</el-button>
+              >修改</el-button
+            >
 
             <el-button
               type="danger"
               :icon="Delete"
-              @click="delArticle(scope.row.id)"
+              @click="delArticle(scope.row._id)"
               size="small"
-            >删除</el-button>
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -164,108 +135,107 @@
         :total="articles.total"
       >
       </el-pagination>
-
     </el-card>
   </div>
 </template>
 
 <script setup>
-import { getCurrentInstance, reactive, ref, watch } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { stampToTime } from '@/comm/functions'
 import { Edit, Delete, Search } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { getArticlesApi, delArticleApi } from '@/comm/fetch'
+import { getCategoriesApi, getLabelsApi } from '../../comm/fetch'
 const router = useRouter()
+const route = useRoute()
 const loading = ref(true)
 const articles = reactive({
   list: [],
   req: {
-    query: '',
+    keyword: '',
     pagesize: 10,
     pagenum: 1,
     category_id: '',
-    label_ids: ''
+    label_ids: '',
   },
-  category_id: [],
   label_ids: [],
   total: 0,
   categories: [],
   labels: [],
-  pagesizes: [1, 5, 10, 20]
+  pagesizes: [1, 5, 10, 20],
 })
-const { proxy: p } = getCurrentInstance()
 // 获取文章列表
 const getArticles = async () => {
   loading.value = true
-  const { data: res } = await p.$axios.get('/adminApi/articles', { params: articles.req })
-  if (res.meta.status !== 200) return ElMessage.error(res.meta.msg)
-  loading.value = false
-  articles.list = res.data.data
-  articles.total = res.data.total
+  const res = await getArticlesApi(articles.req)
+  if (res.status === 200 && res.ok) {
+    loading.value = false
+    articles.list = res.data.data
+    articles.total = res.data.total
+  }
 }
 getArticles()
 // 获取分类
 const getCategories = async () => {
-  const { data: res } = await p.$axios.get('/adminApi/categories')
-  if (res.meta.status !== 200) return ElMessage.error('获取分类出错')
-  articles.categories = res.data
+  const res = await getCategoriesApi()
+  if (res.status === 200 && res.ok) articles.categories = res.data.data
 }
 getCategories()
 // 获取标签
 const getLabels = async () => {
-  const { data: res } = await p.$axios.get('/adminApi/labels')
-  if (res.meta.status !== 200) return ElMessage.error('获取标签出错')
-  articles.labels = res.data
+  const res = await getLabelsApi()
+  if (res.status === 200 && res.ok) articles.labels = res.data.data
 }
 getLabels()
 // 搜索
 const searchArticle = () => {
-  articles.req.category_id = articles.category_id.toString()
   articles.req.label_ids = articles.label_ids.toString()
   getArticles()
 }
 // 搜索输入框清空的时候返回全部数据
-const changeNull = val => {
-  if (!val) {
+const changeNull = (val) => {
+  if (val == '') {
     getArticles()
   }
 }
 // 改变每页数据条数
-const pageSizeChange = size => {
+const pageSizeChange = (size) => {
   articles.req.pagesize = size
   getArticles()
 }
 // 改变页码
-const pageCurrentChange = page => {
+const pageCurrentChange = (page) => {
   articles.req.pagenum = page
   getArticles()
 }
 // 删除文章
-const delArticle = async id => {
-  ElMessageBox.confirm(
-    '确认删除文章？',
-    '警告',
-    {
-      distinguishCancelAndClose: true,
-      confirmButtonText: '确认',
-      cancelButtonText: '取消'
-    }
-  )
+const delArticle = async (id) => {
+  ElMessageBox.confirm('确认删除文章？', '警告', {
+    distinguishCancelAndClose: true,
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+  })
     .then(async () => {
       ElMessage({
         dangerouslyUseHTMLString: true,
         message: '正在删除中',
         type: 'warning',
-        duration: 0
+        duration: 0,
       })
-      const { data: res } = await p.$axios.delete(`/adminApi/articles/${id}`)
-      if (res.meta.status !== 200) return ElMessage.error(res.meta.msg)
-      ElMessage.closeAll()
-      ElMessage.success(res.meta.msg)
+      const res = await delArticleApi(id)
+      if (res.status === 200 && res.ok) {
+        ElMessage.closeAll()
+        ElMessage.success('删除成功')
+      } else {
+        ElMessage.closeAll()
+        ElMessage.error(res.data.message)
+      }
+
       getArticles()
     })
     .catch(() => {
       ElMessage.closeAll()
-      ElMessage.error('您取消了操作')
+      // ElMessage.error('您取消了操作')
     })
 }
 // 跳转到添加文章页面
@@ -273,18 +243,14 @@ const delArticle = async id => {
 const toAddArticle = () => {
   router.push({ name: 'AddArticle' })
 }
-// 监听
-watch(() => p.$route.path,
-  () => { getArticles() })
 
-//
-const showEditView = article => {
-  router.push({ name: 'EditArticle', query: { id: article.id } })
+const showEditView = (article) => {
+  router.push({ name: 'EditArticle', query: { id: article._id } })
 }
-const formatLabel = labels => {
-  return labels.split(',')
-}
-
+watch(route, (n) => {
+  loading.value = true
+  getArticles()
+})
 </script>
 
 <style lang="stylus" scoped>
@@ -292,9 +258,6 @@ const formatLabel = labels => {
   display flex
   div {
     margin-right 10px
-    >>>.el-input {
-      width 100%
-    }
   }
 }
 .img-box {

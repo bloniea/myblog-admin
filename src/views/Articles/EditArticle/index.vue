@@ -1,9 +1,11 @@
 <template>
   <div class="editArticle">
     <el-breadcrumb separator-class="el-icon-arrow-right">
-      <el-breadcrumb-item :to="{ name:'Home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name: 'Home' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>文章管理</el-breadcrumb-item>
-      <el-breadcrumb-item :to="{ name:'Articles' }">文章列表</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ name: 'Articles' }"
+        >文章列表</el-breadcrumb-item
+      >
       <el-breadcrumb-item>添加文章</el-breadcrumb-item>
     </el-breadcrumb>
     <el-card>
@@ -14,91 +16,54 @@
         v-loading="loading"
         :rules="article.rules"
       >
-
-        <el-form-item
-          label="标题"
-          prop="title"
-        >
+        <el-form-item label="标题" prop="title">
           <el-input v-model="article.req.title"></el-input>
         </el-form-item>
         <div class="category_label">
-          <el-form-item
-            label="分类"
-            prop="category_id"
-          >
+          <el-form-item label="分类" prop="category_id">
             <el-select
-              v-model="article.category_id"
+              v-model="article.req.category_id"
               placeholder="请选择分类"
             >
               <el-option
                 v-for="item in article.categories"
-                :key="item.id"
+                :key="item._id"
                 :label="item.cat_name"
-                :value="item.id"
+                :value="item._id"
               >
               </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="标签">
             <el-select
-              v-model="article.label_ids"
+              v-model="article.req.label_ids"
               multiple
               placeholder="请选择标签"
             >
               <el-option
                 v-for="item in article.labels"
-                :key="item.id"
-                :label="item.label_name"
-                :value="item.id"
+                :key="item._id"
+                :label="item.name"
+                :value="item._id"
               >
               </el-option>
             </el-select>
           </el-form-item>
-
         </div>
-        <el-form-item
-          label="图片来源"
-          prop="img_source"
-        >
+        <el-form-item label="图片来源" prop="img_source">
           <el-input v-model="article.req.img_source"></el-input>
         </el-form-item>
-        <el-form-item
-          label="图片地址"
-          prop="img_url"
-        >
+        <el-form-item label="图片地址" prop="img_url">
           <el-input v-model="article.req.img_url"></el-input>
 
           <img
             v-if="article.req.img_url"
             :src="article.req.img_url"
             class="preview"
-          >
-
-          <!-- <el-upload
-            class="avatar-uploader"
-            action="/adminApi/upload"
-            :show-file-list="false"
-            :on-success="handleImgSuccess"
-            :headers="headers"
-            accept=".jpg,.png,.jpeg"
-          >
-            <img
-              v-if="article.req.img_url"
-              :src="article.req.img_url"
-              class="avatar"
-            >
-            <i
-              v-else
-              class="el-icon-plus avatar-uploader-icon"
-            ></i>
-          </el-upload> -->
-
+          />
         </el-form-item>
 
-        <el-form-item
-          label="内容"
-          prop="content"
-        >
+        <el-form-item label="内容" prop="content">
           <v-md-editor
             v-model="article.req.content"
             height="400px"
@@ -107,11 +72,11 @@
         <el-form-item>
           <el-button
             type="primary"
-            @click="submitForm('Editform')"
+            @click="submitForm(Editform)"
             :loading="btnLoading.btn"
-          >立即修改</el-button>
-          <el-button @click="resetForm('Editform')">重置</el-button>
-          <el-button @click="resetForm('Editform')">取消</el-button>
+            >立即修改</el-button
+          >
+          <el-button @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -119,12 +84,21 @@
 </template>
 
 <script setup>
-import { getCurrentInstance, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { reactive, ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import {
+  editArticleApi,
+  getArticleApi,
+  getCategoriesApi,
+  getLabelsApi,
+} from '../../../comm/fetch'
+import { exisets } from '@/comm/functions'
 const router = useRouter()
+const route = useRoute()
 const loading = ref(true)
+const Editform = ref()
 const btnLoading = reactive({
-  btn: false
+  btn: false,
 })
 const article = reactive({
   req: {
@@ -133,87 +107,89 @@ const article = reactive({
     label_ids: '',
     img_url: '',
     content: '',
-    img_source: ''
+    img_source: '',
   },
-  category_id: [],
-  label_ids: [],
   categories: [],
   labels: [],
   rules: {
     title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
     category_id: [{ required: true, message: '请选择分类', trigger: 'blur' }],
     img_url: [{ required: true, message: '请输入图片地址', trigger: 'blur' }],
-    img_source: [{ required: true, message: '请输入图片来源', trigger: 'blur' }],
-    content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
-  }
-
+    img_source: [
+      { required: true, message: '请输入图片来源', trigger: 'blur' },
+    ],
+    content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
+  },
 })
 const headers = reactive({
-  Authorization: window.sessionStorage.getItem('token') ? window.sessionStorage.getItem('token') : ''
+  Authorization: window.sessionStorage.getItem('token')
+    ? window.sessionStorage.getItem('token')
+    : '',
 })
-const { proxy: p } = getCurrentInstance()
+
+// 获取分类
+const getCategories = async () => {
+  const res = await getCategoriesApi()
+  if (res.status === 200 && res.ok) {
+    article.categories = res.data.data
+  }
+}
+
+// 获取标签
+const getLabels = async () => {
+  const res = await getLabelsApi()
+  if (res.status === 200 && res.ok) {
+    article.labels = res.data.data
+  }
+}
 
 // 获取文章
 const getArticle = async () => {
   loading.value = true
-  const id = p.$route.query.id
-  const { data: res } = await p.$axios.get(`/adminApi/article/${id}`)
-  if (res.meta.status !== 200) return ElMessage.error(res.meta.msg)
-  loading.value = false
-  article.req.title = res.data.title
-  article.req.category_id = res.data.category_id
-  article.req.label_ids = res.data.label_ids
-  article.req.img_url = res.data.img_url
-  article.req.content = res.data.content
-  article.req.img_source = res.data.img_source
-  article.category_id = res.data.category_id
-  const ids = res.data.label_ids ? res.data.label_ids.split(',') : []
-  ids.forEach(id => article.label_ids.push(parseInt(id)))
+  const id = route.query.id
+  const res = await getArticleApi(id)
+  if (res.status === 200 && res.ok) {
+    article.req = res.data.data
+    await getLabels()
+    await getCategories()
+    loading.value = false
+    article.req.category_id = (await exisets(
+      article.req.category_id,
+      article.categories
+    ))
+      ? res.data.data.category_id
+      : ''
+    article.req.label_ids = (await exisets(
+      article.req.label_ids,
+      article.labels
+    ))
+      ? res.data.data.label_ids
+      : []
+  }
 }
 getArticle()
-// 获取分类
-const getCategories = async () => {
-  loading.value = true
-  const { data: res } = await p.$axios.get('/adminApi/categories')
-  if (res.meta.status !== 200) return ElMessage.error(res.meta.msg)
-  article.categories = res.data
-  loading.value = false
-}
-getCategories()
-// 获取标签
-const getLabels = async () => {
-  loading.value = true
-  const { data: res } = await p.$axios.get('/adminApi/labels')
-  if (res.meta.status !== 200) return ElMessage.error(res.meta.msg)
-  article.labels = res.data
-  loading.value = false
-}
-getLabels()
-// 上传图片成功回调
-
-// const handleImgSuccess = response => {
-//   if (response.meta.status !== 200) return ElMessage.error(response.meta.msg)
-//   article.req.img_url = response.data.img_url
-// }
 // 修改文章
-const submitForm = form => {
-  article.req.category_id = article.category_id.toString()
-  article.req.label_ids = article.label_ids.toString()
-  p.$refs[form].validate(async valid => {
+const submitForm = (form) => {
+  if (!form) return
+  form.validate(async (valid) => {
     if (valid) {
+      const id = route.query.id
       btnLoading.btn = true
-      const { data: res } = await p.$axios.put(`/adminApi/articles/${p.$route.query.id}`, article.req)
-      if (res.meta.status !== 200) {
+      const res = await editArticleApi(id, article.req)
+      if (res.status === 200 && res.ok) {
+        ElMessage.success('修改成功')
         btnLoading.btn = false
-        return ElMessage.error(res.meta.msg)
+        router.push({ name: 'Articles' })
+      } else {
+        btnLoading.btn = false
+        ElMessage.error(res.data.message)
       }
-      ElMessage.success(res.meta.msg)
-      btnLoading.btn = false
-      router.push({ name: 'Articles' })
     }
   })
 }
-
+const resetForm = (form) => {
+  getArticle()
+}
 </script>
 
 <style lang="stylus" scoped>
@@ -223,14 +199,14 @@ const submitForm = form => {
     width 30%
   }
 }
-.avatar-uploader >>> .el-upload {
+:deep(.avatar-uploader .el-upload) {
   border 1px dashed #d9d9d9
   border-radius 6px
   cursor pointer
   position relative
   overflow hidden
 }
-.avatar-uploader>>>.el-upload:hover {
+:deep(.avatar-uploader .el-upload:hover) {
   border-color #F284A9
 }
 .avatar-uploader-icon {

@@ -38,8 +38,7 @@ import router from './router'
 // 全局css
 import '@/assets/css/global.styl'
 import '@/assets/iconfont/css.styl'
-// axios
-import axios from './axios'
+
 
 VMdEditor.Codemirror = Codemirror;
 VMdEditor.use(githubTheme, {
@@ -47,7 +46,7 @@ VMdEditor.use(githubTheme, {
 });
 const app = createApp(App)
 
-app.config.globalProperties.$axios = axios
+
 app
     .use(VMdEditor)
     .use(router)
