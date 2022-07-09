@@ -55,7 +55,7 @@
                 <el-input
                   v-model="anime.addData.content[index].episode"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                 </el-input>
               </div>
@@ -65,7 +65,7 @@
                 <el-input
                   v-model="anime.addData.content[index].ass"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                 </el-input>
               </div>
@@ -74,7 +74,7 @@
                 <el-input
                   v-model="anime.addData.content[index].vtt"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                 </el-input>
               </div>
@@ -106,7 +106,7 @@
             v-model="anime.addData.fonts"
             type="textarea"
             placeholder="https://example1.com/1.ttf,https://example1.com/2.ttf"
-            autosize="true"
+            :autosize="true"
           >
           </el-input>
         </el-form-item>
@@ -188,6 +188,8 @@ const submitForm = async (form) => {
       if (res.status == 200 && res.ok) {
         router.push({ name: 'Anime' })
         ElMessage.success('添加成功')
+      } else {
+        ElMessage.error(res.data.message)
       }
       btnLoading.value = false
     }

@@ -89,10 +89,12 @@ const submitForm = async (form) => {
       const id = route.query.id
       const res = await editAboutArticle(id, article.editData)
       if (res.status == 200 && res.ok) {
-        btnLoading.value = false
         router.push({ name: 'aboutArticle' })
         ElMessage.success('修改成功')
+      } else {
+        ElMessage.error(res.data.message)
       }
+      btnLoading.value = false
     }
   })
 }

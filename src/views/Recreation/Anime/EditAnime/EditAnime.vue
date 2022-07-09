@@ -56,7 +56,7 @@
                   v-model="anime.editData.content[index].episode"
                   @blur="blurClose(tag)"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                 </el-input>
               </div>
@@ -67,7 +67,7 @@
                   v-model="anime.editData.content[index].ass"
                   @blur="blurClose(tag)"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                   ></el-input
                 >
@@ -78,7 +78,7 @@
                   v-model="anime.editData.content[index].vtt"
                   @blur="blurClose(tag)"
                   type="textarea"
-                  autosize="true"
+                  :autosize="true"
                 >
                   ></el-input
                 >
@@ -113,7 +113,7 @@
             v-model="anime.editData.fonts"
             type="textarea"
             placeholder="https://example1.com/1.ttf,https://example1.com/2.ttf"
-            autosize="true"
+            :autosize="true"
           >
           </el-input>
         </el-form-item>
@@ -214,6 +214,8 @@ const submitForm = async (form) => {
       if (res.status == 200 && res.ok) {
         router.push({ name: 'Anime' })
         ElMessage.success('修改成功')
+      } else {
+        ElMessage.error(res.data.message)
       }
       btnLoading.value = false
     }

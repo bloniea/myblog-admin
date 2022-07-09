@@ -70,10 +70,12 @@ const submitForm = async (form) => {
       btnLoading.value = true
       const res = await addAboutArticle(article.addData)
       if (res.status == 200 && res.ok) {
-        btnLoading.value = false
         router.push({ name: 'aboutArticle' })
         ElMessage.success('添加成功')
+      } else {
+        ElMessage.error(res.data.message)
       }
+      btnLoading.value = false
     }
   })
 }

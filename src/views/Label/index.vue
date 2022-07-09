@@ -113,7 +113,7 @@
     </el-dialog>
     <!-- 修改 -->
     <el-dialog
-      title="添加标签"
+      title="修改标签"
       v-model="form.editVisible"
       width="30%"
       @close="editClose(editForm)"
