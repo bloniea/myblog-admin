@@ -61,7 +61,7 @@
               </div>
 
               <div class="tag-list">
-                <span>字幕ass:</span>
+                <span>ass字幕:</span>
                 <el-input
                   v-model="anime.addData.content[index].ass"
                   type="textarea"
@@ -70,7 +70,7 @@
                 </el-input>
               </div>
               <div class="tag-list">
-                <span>字幕vtt:</span>
+                <span>vtt字幕:</span>
                 <el-input
                   v-model="anime.addData.content[index].vtt"
                   type="textarea"

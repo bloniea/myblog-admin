@@ -62,7 +62,7 @@
               </div>
 
               <div class="tag-list">
-                <span>字幕:</span>
+                <span>ass字幕:</span>
                 <el-input
                   v-model="anime.editData.content[index].ass"
                   @blur="blurClose(tag)"
@@ -73,7 +73,7 @@
                 >
               </div>
               <div class="tag-list">
-                <span>字幕:</span>
+                <span>vtt字幕:</span>
                 <el-input
                   v-model="anime.editData.content[index].vtt"
                   @blur="blurClose(tag)"
