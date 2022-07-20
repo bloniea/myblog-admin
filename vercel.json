@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/adminApi/:match*",
+      "destination": "https://blogapi.bloniea.ml/api/private/:match*"
+    },
+    { "source": "/(.*)", "destination": "/" }
+  ]
+}
