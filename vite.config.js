@@ -30,7 +30,7 @@ export default defineConfig({
     proxy: {
       '/adminApi': {
         target: 'https://api.bloniea.xyz/blogAdmin/api/private/',
-        // target: 'http://localhost:5555/api/private/',
+        // target: 'http://localhost:5555/api/private/111',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/adminApi/, '')
       },
