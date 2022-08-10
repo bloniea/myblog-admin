@@ -61,28 +61,6 @@
                 </el-input>
               </div>
 
-              <div class="tag-list">
-                <span>ass字幕:</span>
-                <el-input
-                  v-model="anime.editData.content[index].ass"
-                  @blur="blurClose(tag)"
-                  type="textarea"
-                  :autosize="true"
-                >
-                  ></el-input
-                >
-              </div>
-              <div class="tag-list">
-                <span>vtt字幕:</span>
-                <el-input
-                  v-model="anime.editData.content[index].vtt"
-                  @blur="blurClose(tag)"
-                  type="textarea"
-                  :autosize="true"
-                >
-                  ></el-input
-                >
-              </div>
               <el-button
                 :icon="Delete"
                 class="delete"
@@ -108,15 +86,6 @@
           </div>
         </el-form-item>
 
-        <el-form-item label="字幕字体" prop="fonts">
-          <el-input
-            v-model="anime.editData.fonts"
-            type="textarea"
-            placeholder="https://example1.com/1.ttf,https://example1.com/2.ttf"
-            :autosize="true"
-          >
-          </el-input>
-        </el-form-item>
         <el-form-item>
           <el-button
             type="primary"
@@ -149,7 +118,6 @@ const anime = reactive({
     generalize: '',
     content: [],
     img_url: '',
-    fonts: '',
   },
   rules: {
     name: [{ required: true, message: '请输入标题', trigger: 'blur' }],
