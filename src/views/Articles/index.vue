@@ -168,7 +168,7 @@ const articles = reactive({
 const getArticles = async () => {
   loading.value = true
   const res = await getArticlesApi(articles.req)
-  if (res.status === 200 && res.ok) {
+  if ( res.ok) {
     loading.value = false
     articles.list = res.data.data
     articles.total = res.data.total
@@ -178,13 +178,13 @@ getArticles()
 // 获取分类
 const getCategories = async () => {
   const res = await getCategoriesApi()
-  if (res.status === 200 && res.ok) articles.categories = res.data.data
+  if (  res.ok) articles.categories = res.data.data
 }
 getCategories()
 // 获取标签
 const getLabels = async () => {
   const res = await getLabelsApi()
-  if (res.status === 200 && res.ok) articles.labels = res.data.data
+  if ( res.ok) articles.labels = res.data.data
 }
 getLabels()
 // 搜索
@@ -223,7 +223,7 @@ const delArticle = async (id) => {
         duration: 0,
       })
       const res = await delArticleApi(id)
-      if (res.status === 200 && res.ok) {
+      if (res.ok) {
         ElMessage.closeAll()
         ElMessage.success('删除成功')
       } else {
