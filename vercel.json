@@ -5,6 +5,9 @@
       "source": "/adminApi/:match*",
       "destination": "https://blogapi.bloniea.ml/api/private/:match*"
     },
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
