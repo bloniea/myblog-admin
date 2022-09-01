@@ -168,7 +168,7 @@ const articles = reactive({
 const getArticles = async () => {
   loading.value = true
   const res = await getArticlesApi(articles.req)
-  console.log(res)
+  // console.log(res)
   if ( res.ok) {
     loading.value = false
     articles.list = res.data.data

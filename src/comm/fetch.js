@@ -142,7 +142,7 @@ export const editLabelApi = async (id, params) => {
 }
 
 export const getFriendsApi = async (params) => {
-  const url = api + '/friends/'
+  const url = api + '/friends'
   return await fetchApi(url, { params: params })
 }
 export const addFriendApi = async (params) => {
@@ -158,7 +158,7 @@ export const editFriendApi = async (id, params) => {
   return await fetchApi(url, { method: 'put', body: JSON.stringify(params) })
 }
 export const getArticlesApi = async (params) => {
-  const url = api + '/articles/'
+  const url = api + '/articles'
   return await fetchApi(url, { params: params })
 }
 export const getArticleApi = async (id) => {
@@ -170,7 +170,7 @@ export const delArticleApi = async (id) => {
   return await fetchApi(url, { method: 'delete' })
 }
 export const addArticleApi = async (params) => {
-  const url = api + '/article/'
+  const url = api + '/article'
   return await fetchApi(url, { method: 'post', body: JSON.stringify(params) })
 }
 export const editArticleApi = async (id, params) => {
