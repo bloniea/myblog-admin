@@ -8,42 +8,22 @@
     </el-breadcrumb>
 
     <el-card>
-      <el-form
-        ref="editForm"
-        :model="anime.editData"
-        label-width="80px"
-        :rules="anime.rules"
-        v-loading="loading"
-      >
+      <el-form ref="editForm" :model="anime.editData" label-width="80px" :rules="anime.rules" v-loading="loading">
         <el-form-item label="标题" prop="name">
           <el-input v-model="anime.editData.name" placeholder="标题"></el-input>
         </el-form-item>
         <el-form-item label="图片" prop="img_url">
-          <el-input
-            v-model="anime.editData.img_url"
-            placeholder="htts://example1/1.png"
-          ></el-input>
-          <img
-            v-if="anime.editData.img_url"
-            :src="anime.editData.img_url"
-            class="preview"
-          />
+          <el-input v-model="anime.editData.img_url" placeholder="htts://example1/1.png"></el-input>
+          <img v-if="anime.editData.img_url" :src="anime.editData.img_url" class="preview" />
         </el-form-item>
         <el-form-item label="内容" prop="generalize">
           <!-- 添加一个不显示的input已显示 v-md-editor 的校验信息-->
           <el-input v-model="anime.editData.generalize" class="seat"></el-input>
-          <v-md-editor
-            v-model="anime.editData.generalize"
-            height="400px"
-          ></v-md-editor>
+          <v-md-editor v-model="anime.editData.generalize" height="400px"></v-md-editor>
         </el-form-item>
         <el-form-item label="内容" prop="content">
           <div class="tags">
-            <div
-              class="tag"
-              v-for="(tag, index) in anime.editData.content"
-              :key="index"
-            >
+            <div class="tag" v-for="(tag, index) in anime.editData.content" :key="index">
               <div class="tag-list">
                 <span>第{{ index + 1 }}集:</span>
                 <el-input v-model="anime.editData.content[index].title">
@@ -52,47 +32,23 @@
 
               <div class="tag-list">
                 <span>视频:</span>
-                <el-input
-                  v-model="anime.editData.content[index].episode"
-                  @blur="blurClose(tag)"
-                  type="textarea"
-                  :autosize="true"
-                >
+                <el-input v-model="anime.editData.content[index].episode" @blur="blurClose(tag)" type="textarea"
+                  :autosize="true">
                 </el-input>
               </div>
 
-              <el-button
-                :icon="Delete"
-                class="delete"
-                @click="handleClose(tag)"
-              ></el-button>
+              <el-button :icon="Delete" class="delete" @click="handleClose(tag)"></el-button>
             </div>
-            <el-input
-              v-if="inputVisible"
-              ref="InputRef"
-              v-model="inputValue"
-              size="small"
-              @keyup.enter="handleInputConfirm"
-              @blur="handleInputConfirm"
-            />
-            <el-button
-              v-else
-              class="button-new-tag ml-1"
-              size="small"
-              @click="showInput"
-            >
+            <el-input v-if="inputVisible" ref="InputRef" v-model="inputValue" size="small"
+              @keyup.enter="handleInputConfirm" @blur="handleInputConfirm" />
+            <el-button v-else class="button-new-tag ml-1" size="small" @click="showInput">
               添加集数
             </el-button>
           </div>
         </el-form-item>
 
         <el-form-item>
-          <el-button
-            type="primary"
-            @click="submitForm(editForm)"
-            :loading="btnLoading"
-            >立即修改</el-button
-          >
+          <el-button type="primary" @click="submitForm(editForm)" :loading="btnLoading">立即修改</el-button>
           <el-button @click="editForm.resetFields()">重置</el-button>
         </el-form-item>
       </el-form>
@@ -111,7 +67,6 @@ const btnLoading = ref(false)
 const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
-const aaaa = `https://drive.bloniea.xyz/api/v3/file/source/302/%E6%96%B9%E6%AD%A3%E4%BB%BF%E5%AE%8B_GBK.ttf?sign=NTWTUHKJ0qJfW20hxvdfaBY91KMYN5mfl4bc4K4nsns%3D%3A0, https://drive.bloniea.xyz/api/v3/file/source/303/%E6%96%B9%E6%AD%A3%E5%85%B0%E4%BA%AD%E5%9C%86_GBK_%E4%B8%AD.ttf?sign=jBjT1fAnkRXwLgLtkKvxVuHbYsqsOfCgo00efKWsiX4%3D%3A0, https://drive.bloniea.xyz/api/v3/file/source/304/%E6%96%B9%E6%AD%A3%E5%85%B0%E4%BA%AD%E9%BB%91Pro%20Global%20Demibold.ttf?sign=LJMtp9r2FIKoQoI4QW_Ac-M3htpwnPETgEwN8_3FOwQ%3D%3A0,https://drive.bloniea.xyz/api/v3/file/source/305/%E6%96%B9%E6%AD%A3%E5%85%B0%E4%BA%AD%E9%BB%91Pro%20Global%20Heavy.ttf?sign=uzB2wZgvpJxkqacIvieKQm8h8VAoYk9Zj8R9hP4kz_Y%3D%3A0,https://drive.bloniea.xyz/api/v3/file/source/306/%E6%96%B9%E6%AD%A3%E5%85%B0%E4%BA%AD%E9%BB%91Pro%20Global%20Light.ttf?sign=225-amkIcSuJxP9oyaSb0jmgmUaHW6XMhGC4Xy0-9eg%3D%3A0,GBK_2.ttf: https://drive.bloniea.xyz/api/v3/file/source/308/%E6%96%B9%E6%AD%A3%E7%B2%97%E9%9B%85%E5%AE%8B_GBK_2.ttf?sign=5jEZmGSBS99mEZ0rUG3LHfYo3TwCgYRYlow9MUFcwNw%3D%3A0,https://drive.bloniea.xyz/api/v3/file/source/309/%E6%96%B9%E6%AD%A3%E7%BA%A4%E9%9B%85%E5%AE%8B_GBK_2.ttf?sign=QpHPyWPUzU9OAsXJj8GMAT6jFlfyuRLVISseTXGuAKc%3D%3A0, https://drive.bloniea.xyz/api/v3/file/source/310/%E6%B1%89%E4%BB%AA%E5%AE%B6%E4%B9%A6%E7%AE%80.ttf?sign=gYrtDM-kjfpye2jEa6ZVE4mwhim5BA7ttR_fDmC-5Q0%3D%3A0https://drive.bloniea.xyz/api/v3/file/source/138/%E6%96%B9%E6%AD%A3%`
 const anime = reactive({
   editData: {
     name: '',

@@ -2,63 +2,29 @@
   <div class="login">
     <div class="login-form">
       <div class="avatar-box">
-        <img
-          src="https://cloud.bloniea.xyz/images/avatar.png"
-          alt=""
-        >
+        <img src="https://image-cdn.bloniea.ml/images1/avatar.png" alt="">
       </div>
       <h3 class="title">
         博客后台管理系统
       </h3>
-      <el-form
-        ref="loginForm"
-        :model="loginData"
-        label-width="80px"
-        :rules="loginRules"
-      >
-        <el-form-item
-          label="用户名"
-          prop="user"
-        >
-          <el-input
-            v-model="loginData.user"
-            @keyup.enter="onSubmit(loginForm)"
-          ></el-input>
+      <el-form ref="loginForm" :model="loginData" label-width="80px" :rules="loginRules">
+        <el-form-item label="用户名" prop="user">
+          <el-input v-model="loginData.user" @keyup.enter="onSubmit(loginForm)"></el-input>
         </el-form-item>
-        <el-form-item
-          label="密码"
-          prop="password"
-        >
+        <el-form-item label="密码" prop="password">
 
-          <el-input
-            v-model="loginData.password"
-            type="password"
-            @keyup.enter="onSubmit(loginForm)"
-          ></el-input>
+          <el-input v-model="loginData.password" type="password" @keyup.enter="onSubmit(loginForm)"></el-input>
         </el-form-item>
-        <el-form-item
-          label="验证码"
-          prop="code"
-        >
+        <el-form-item label="验证码" prop="code">
           <div class="s-identify-box">
-            <el-input
-              v-model="loginData.code"
-              @keyup.enter="onSubmit(loginForm)"
-            ></el-input>
-            <SIdentify
-              :identifyCode="code"
-              @click="identifyCode"
-            ></SIdentify>
+            <el-input v-model="loginData.code" @keyup.enter="onSubmit(loginForm)"></el-input>
+            <SIdentify :identifyCode="code" @click="identifyCode"></SIdentify>
           </div>
 
         </el-form-item>
         <el-form-item class="login-btn">
 
-          <el-button
-            type="primary"
-            :loading="loginLoad"
-            @click="onSubmit(loginForm)"
-          >登陆</el-button>
+          <el-button type="primary" :loading="loginLoad" @click="onSubmit(loginForm)">登陆</el-button>
           <el-button @click="reset(loginForm)">重置 </el-button>
         </el-form-item>
       </el-form>
