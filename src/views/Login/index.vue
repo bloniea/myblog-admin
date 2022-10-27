@@ -2,29 +2,49 @@
   <div class="login">
     <div class="login-form">
       <div class="avatar-box">
-        <img src="https://image-cdn.bloniea.ml/images1/avatar.png" alt="">
+        <img src="https://image-cdn.bloniea.ml/images1/avatar.png" alt="" />
       </div>
-      <h3 class="title">
-        博客后台管理系统
-      </h3>
-      <el-form ref="loginForm" :model="loginData" label-width="80px" :rules="loginRules">
+      <h3 class="title">博客后台管理系统</h3>
+      <el-form
+        ref="loginForm"
+        :model="loginData"
+        label-width="80px"
+        :rules="loginRules"
+      >
         <el-form-item label="用户名" prop="user">
-          <el-input v-model="loginData.user" @keyup.enter="onSubmit(loginForm)"></el-input>
+          <el-input
+            v-model="loginData.user"
+            @keyup.enter="onSubmit(loginForm)"
+          ></el-input>
         </el-form-item>
         <el-form-item label="密码" prop="password">
-
-          <el-input v-model="loginData.password" type="password" @keyup.enter="onSubmit(loginForm)"></el-input>
+          <el-input
+            v-model="loginData.password"
+            type="password"
+            @keyup.enter="onSubmit(loginForm)"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="验证码" prop="code">
+        <el-form-item label="验证" prop="code">
           <div class="s-identify-box">
-            <el-input v-model="loginData.code" @keyup.enter="onSubmit(loginForm)"></el-input>
-            <SIdentify :identifyCode="code" @click="identifyCode"></SIdentify>
-          </div>
+            <div style="display: none">
+              <el-input v-model="loginData.code"></el-input>
+            </div>
 
+            <sliderIdentify
+              :codeStatus="loginData.code"
+              @status="status"
+            ></sliderIdentify>
+            <!-- <el-input v-model="loginData.code" @keyup.enter="onSubmit(loginForm)"></el-input> -->
+            <!-- <SIdentify :identifyCode="code" @click="identifyCode"></SIdentify> -->
+          </div>
         </el-form-item>
         <el-form-item class="login-btn">
-
-          <el-button type="primary" :loading="loginLoad" @click="onSubmit(loginForm)">登陆</el-button>
+          <el-button
+            type="primary"
+            :loading="loginLoad"
+            @click="onSubmit(loginForm)"
+            >登陆</el-button
+          >
           <el-button @click="reset(loginForm)">重置 </el-button>
         </el-form-item>
       </el-form>
@@ -34,33 +54,24 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance } from 'vue'
-import { useRouter, useRoute, } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import SIdentify from '@/components/SIdentify/index.vue'
+import sliderIdentify from '@/components/sliderIdentify/sliderIdentify.vue'
 import { login } from '@/comm/fetch'
 
 const router = useRouter()
 
-
 const validateCode = (rule, value, callback) => {
-  if (value === '') {
-    callback(new Error('请输入验证码'))
+  if (!value) {
+    callback(new Error('请先完成验证1'))
   } else {
-    if (loginData.code !== code.value) {
-      callback(new Error('验证码错误'))
-    } else {
-      callback()
-    }
-
+    callback()
   }
 }
 // 变量
 const loginRules = {
-  user: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ],
+  user: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   code: [{ validator: validateCode, trigger: 'change' }],
 }
 
@@ -75,19 +86,25 @@ const identifyCode = () => {
   code.value = c
 }
 // 初始化验证码
-identifyCode()
+// identifyCode()
 // 登录信息
 const loginData = reactive({
   user: 'test',
   password: '123456',
-  code: ''
+  code: false,
 })
+const status = (val) => {
+  loginData.code = val
+}
+// 弹窗
 
 const loginForm = ref()
 const loginLoad = ref(false)
 // 登陆
 const onSubmit = (loginForm) => {
-  loginForm.validate(async valid => {
+  // loginData.code = false
+  // return
+  loginForm.validate(async (valid) => {
     if (valid) {
       loginLoad.value = true
       const reqData = { user: loginData.user, password: loginData.password }
@@ -95,9 +112,15 @@ const onSubmit = (loginForm) => {
       if (res.ok && res.status === 200) {
         loginLoad.value = false
         ElMessage.success('登录成功')
-        window.localStorage.setItem('userInfo', JSON.stringify(res.data.data.user))
+        window.localStorage.setItem(
+          'userInfo',
+          JSON.stringify(res.data.data.user)
+        )
         window.localStorage.setItem('token', res.data.data.token)
-        window.localStorage.setItem('refresh_token', res.data.data.refresh_token)
+        window.localStorage.setItem(
+          'refresh_token',
+          res.data.data.refresh_token
+        )
         router.push({ name: 'Welcome' })
       } else {
         loginLoad.value = false
@@ -110,11 +133,9 @@ const onSubmit = (loginForm) => {
 const reset = (loginForm) => {
   loginForm.resetFields()
 }
-
-
 </script>
 
-<style lang='stylus' scoped>
+<style lang="stylus" scoped>
 .login {
   width 100%
   height 100%
